@@ -166,7 +166,23 @@ class MainActivity : AppCompatActivity(), WebSocketClientManager.ConnectionListe
         val sample = "Your DroidBridge verification code is 482731. Do not share."
         val res = testDetector.detectOtp(sample)
         if (res != null) {
-            Toast.makeText(this, "Test OTP detected: ${res.code} (${res.confidence})", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Forwarding test OTP: ${res.code} to Mac...", Toast.LENGTH_SHORT).show()
+
+            val payload = com.droidbridge.android.model.NotificationPayload(
+                id = "test_${System.currentTimeMillis()}",
+                packageName = "com.droidbridge.android",
+                appName = "DroidBridge Test",
+                title = "Security Verification",
+                text = sample,
+                postTime = System.currentTimeMillis(),
+                hasOtp = true,
+                otp = com.droidbridge.android.model.OtpInfo(
+                    code = res.code,
+                    confidence = res.confidence.name.lowercase(),
+                    expiresInSeconds = res.expiresInSeconds
+                )
+            )
+            wsManager.sendNotification(payload)
         }
     }
 
