@@ -68,10 +68,29 @@ class DroidBridgeNotificationService : NotificationListenerService() {
 
         // Extract title and text safely from extras
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim() ?: ""
-        val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
+        var text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
         val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()?.trim() ?: ""
+        val textLines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
 
-        val effectiveText = if (bigText.isNotEmpty()) bigText else text
+        var effectiveText = if (bigText.isNotEmpty()) bigText else text
+        if (textLines != null && textLines.isNotEmpty()) {
+            val joinedLines = textLines.joinToString("\n") { it.toString().trim() }
+            if (joinedLines.isNotEmpty()) {
+                effectiveText = "$effectiveText\n$joinedLines".trim()
+            }
+        }
+
+        // Support Android Notification.MessagingStyle bundles
+        val messages = extras.getParcelableArray(Notification.EXTRA_MESSAGES)
+        if (messages != null && messages.isNotEmpty()) {
+            val extracted = messages.mapNotNull {
+                (it as? android.os.Bundle)?.getCharSequence("text")?.toString()
+            }.joinToString("\n")
+            if (extracted.isNotEmpty()) {
+                effectiveText = "$effectiveText\n$extracted".trim()
+            }
+        }
+
         if (title.isEmpty() && effectiveText.isEmpty()) {
             return
         }
