@@ -29,14 +29,17 @@ class OtpDetector(
             Regex("""(?i)\b(?:use|enter|your)\s+([0-9]{4,8})\s+(?:as\s+(?:your\s+)?(?:otp|verification|security\s+code))\b"""),
             Regex("""(?i)\b(?:otp|code|pin)\s*(?:is|:|-)\s*([0-9]{4,8})\b"""),
             Regex("""(?i)\bcode\s*:\s*([0-9]{4,8})\b"""),
-            Regex("""(?i)\b([0-9]{4,8})\s+is\s+your\s+(?:verification|security|login|otp)\b""")
+            Regex("""(?i)\b(?:G-|ID-|OTP-)?([0-9]{4,8})\s+is\s+your\s+(?:verification|security|login|otp|google|code)\b"""),
+            Regex("""(?i)\b([0-9]{4,8})\s+is\s+(?:the\s+)?(?:secret\s+)?(?:otp|code)\b"""),
+            Regex("""(?i)\b(?:is|code|pin)\s+([0-9]{4,8})\b""")
         )
 
         // Medium confidence context markers
         private val MEDIUM_CONFIDENCE_PATTERNS = listOf(
-            Regex("""(?i)\b(?:verify|authenticate|confirm)\s+with\s+([0-9]{4,8})\b"""),
-            Regex("""(?i)\botp\s+([0-9]{4,8})\b"""),
-            Regex("""(?i)\bcode\s+([0-9]{4,8})\b""")
+            Regex("""(?i)\b(?:verify|authenticate|confirm)\s+(?:with|code)?\s*([0-9]{4,8})\b"""),
+            Regex("""(?i)\botp\s*[:\s-]?\s*([0-9]{4,8})\b"""),
+            Regex("""(?i)\bcode\s*[:\s-]?\s*([0-9]{4,8})\b"""),
+            Regex("""(?i)\b(?:secret|pin)\s*[:\s-]?\s*([0-9]{4,8})\b""")
         )
 
         // Disqualifiers (years, currencies, amounts, dates, phone numbers, tracking numbers)

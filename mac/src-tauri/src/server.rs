@@ -147,9 +147,17 @@ pub async fn start_bridge_server(
                                         }
                                     }
                                     "notification" => {
-                                        if let Ok(notif) = serde_json::from_str::<NotificationPayload>(&text) {
-                                            // Emit to frontend
-                                            let _ = app.emit("notification-received", &notif);
+                                        log::info!("Received notification payload from phone: {}", text);
+                                        match serde_json::from_str::<NotificationPayload>(&text) {
+                                            Ok(notif) => {
+                                                let _ = app.emit("notification-received", &notif);
+                                            }
+                                            Err(e) => {
+                                                log::warn!("Failed to deserialize NotificationPayload ({}). Emitting raw JSON value.", e);
+                                                if let Ok(raw_val) = serde_json::from_str::<serde_json::Value>(&text) {
+                                                    let _ = app.emit("notification-received", &raw_val);
+                                                }
+                                            }
                                         }
                                     }
                                     "heartbeat" => {

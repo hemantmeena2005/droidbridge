@@ -44,7 +44,33 @@ export const OtpCard: React.FC<OtpCardProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (!item.otp || timeLeft <= 0) return null;
+  if (!item.otp) {
+    return (
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-md backdrop-blur-md">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs">
+              <Smartphone className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-slate-200">{item.appName}</h4>
+              <p className="text-[10px] text-slate-400">{item.title}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => onDismiss(item.id)}
+            className="p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition-colors"
+            title="Dismiss"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <p className="text-xs text-slate-300 line-clamp-3">{item.text}</p>
+      </div>
+    );
+  }
+
+  if (timeLeft <= 0) return null;
 
   return (
     <div className="bg-slate-900 border border-indigo-500/30 rounded-xl p-5 shadow-xl relative overflow-hidden backdrop-blur-md">
