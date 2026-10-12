@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Smartphone, QrCode, Shield, Bell, Trash2, CheckCircle2 } from 'lucide-react';
+import { Smartphone, QrCode, Shield, Bell, Trash2, CheckCircle2, RefreshCw } from 'lucide-react';
 import type { NotificationItem, PairingInfo, ConnectionStatus } from './types';
 import { OtpCard } from './components/OtpCard';
 import { PairingModal } from './components/PairingModal';
@@ -16,6 +16,14 @@ export const App: React.FC = () => {
   const [pairingInfo, setPairingInfo] = useState<PairingInfo | null>(null);
   const [isPairingOpen, setIsPairingOpen] = useState(false);
   const [hideOtpByDefault, setHideOtpByDefault] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 600);
+  };
 
   // Listen for Tauri backend events
   useEffect(() => {
@@ -36,8 +44,9 @@ export const App: React.FC = () => {
 
         unlistenNotif = await listen<any>('notification-received', (event) => {
           const payload = event.payload;
+          const uniqueSuffix = Math.random().toString(36).substring(2, 7);
           const newItem: NotificationItem = {
-            id: payload.id || `notif_${Date.now()}`,
+            id: payload.id ? `${payload.id}_${uniqueSuffix}` : `notif_${Date.now()}_${uniqueSuffix}`,
             packageName: payload.packageName || payload.package_name || '',
             appName: payload.appName || payload.app_name || 'Android',
             title: payload.title || '',
@@ -175,6 +184,16 @@ export const App: React.FC = () => {
               </>
             )}
           </div>
+
+          <button
+            onClick={handleRefresh}
+            title="Refresh connection status"
+            className={`p-2 rounded-lg border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors ${
+              isRefreshing ? 'animate-spin text-cyan-400' : ''
+            }`}
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
 
           <button
             onClick={openPairing}

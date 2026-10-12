@@ -82,6 +82,12 @@ pub async fn start_bridge_server(
                         Ok(tokio_tungstenite::tungstenite::Message::Text(text)) => {
                             if let Ok(base) = serde_json::from_str::<BaseMessage>(&text) {
                                 match base.msg_type.as_str() {
+                                    "hello" => {
+                                        if let Ok(hello) = serde_json::from_str::<HelloMessage>(&text) {
+                                            log::info!("Device connected: {}", hello.device_name);
+                                            let _ = app.emit("device-paired", &hello.device_name);
+                                        }
+                                    }
                                     "pair_request" => {
                                         if let Ok(req) = serde_json::from_str::<PairRequestMessage>(&text) {
                                             let mut s = state.lock().await;
