@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DroidBridgeProtocol",
+  "description": "DroidBridge WebSocket Communication Protocol Schema",
+  "definitions": {
+    "BaseMessage": {
+      "type": "object",
+      "required": ["version", "type", "timestamp"],
+      "properties": {
+        "version": { "type": "integer", "enum": [1] },
+        "type": {
+          "type": "string",
+          "enum": [
+            "hello",
+            "pair_request",
+            "pair_confirm",
+            "notification",
+            "otp_detected",
+            "heartbeat",
+            "disconnect",
+            "error"
+          ]
+        },
+        "timestamp": { "type": "integer" }
+      }
+    },
+    "HelloMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "hello" },
+            "deviceId": { "type": "string" },
+            "deviceName": { "type": "string" },
+            "authProof": { "type": "string" }
+          },
+          "required": ["deviceId", "deviceName"]
+        }
+      ]
+    },
+    "PairRequestMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "pair_request" },
+            "deviceId": { "type": "string" },
+            "deviceName": { "type": "string" },
+            "challengeResponse": { "type": "string" },
+            "clientPublicKey": { "type": "string" }
+          },
+          "required": ["deviceId", "deviceName", "challengeResponse"]
+        }
+      ]
+    },
+    "PairConfirmMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "pair_confirm" },
+            "macDeviceId": { "type": "string" },
+            "macDeviceName": { "type": "string" },
+            "authToken": { "type": "string" },
+            "success": { "type": "boolean" },
+            "errorReason": { "type": "string" }
+          },
+          "required": ["macDeviceId", "macDeviceName", "success"]
+        }
+      ]
+    },
+    "NotificationMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "notification" },
+            "id": { "type": "string" },
+            "packageName": { "type": "string" },
+            "appName": { "type": "string" },
+            "title": { "type": "string" },
+            "text": { "type": "string" },
+            "postTime": { "type": "integer" },
+            "hasOtp": { "type": "boolean" },
+            "otp": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "string" },
+                "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+                "expiresInSeconds": { "type": "integer" }
+              },
+              "required": ["code", "confidence", "expiresInSeconds"]
+            }
+          },
+          "required": ["id", "packageName", "appName", "title", "postTime"]
+        }
+      ]
+    },
+    "OtpDetectedMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "otp_detected" },
+            "notificationId": { "type": "string" },
+            "appName": { "type": "string" },
+            "code": { "type": "string" },
+            "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+            "expiresInSeconds": { "type": "integer" }
+          },
+          "required": ["notificationId", "appName", "code", "confidence", "expiresInSeconds"]
+        }
+      ]
+    },
+    "HeartbeatMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "heartbeat" },
+            "ping": { "type": "boolean" }
+          },
+          "required": ["ping"]
+        }
+      ]
+    },
+    "DisconnectMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "disconnect" },
+            "reason": { "type": "string" }
+          },
+          "required": ["reason"]
+        }
+      ]
+    },
+    "ErrorMessage": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseMessage" },
+        {
+          "properties": {
+            "type": { "const": "error" },
+            "code": { "type": "string" },
+            "message": { "type": "string" }
+          },
+          "required": ["code", "message"]
+        }
+      ]
+    }
+  }
+}

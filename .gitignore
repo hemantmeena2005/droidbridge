@@ -1,0 +1,9 @@
+node_modules/
+target/
+dist/
+build/
+.gradle/
+*.iml
+.idea/
+*.apk
+app-icon.png
